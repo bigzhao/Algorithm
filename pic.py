@@ -9,6 +9,7 @@ from matplotlib import cm
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import math
+plt.style.use('ggplot')
 
 def draw_multimodal_function():
     with plt.style.context('dark_background'):
@@ -75,5 +76,44 @@ def draw_schaffer_function():
     plt.show()
 
 
+def rosenbrock(x, y):
+    return 100 * (x*x - y)**2 + (1 - x)**2
+
+def draw_rosenbrock():
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    x = np.arange(-8, 8, 0.25)
+    y = np.arange(-8, 8, 0.25)
+    x, y = np.meshgrid(x, y)
+    [r,c] = np.shape(x)
+    z = [[] for _ in range(r)]
+    for i in range(r):
+        for j in range(c):
+            z[i].append(rosenbrock(x[i][j], y[i][j]))
+    ax.plot_surface(x, y, np.array(z), rstride=1, cstride=1,  cmap="gnuplot", linewidth=0, antialiased=False)
+    plt.show()
+
+
+def ackley(x, y):
+    first_sum = 0.0
+    second_sum = 0.0
+    first_sum += (x**2 + y ** 2)
+    second_sum += np.cos(2.0*np.pi*x) + np.cos(2.0 * np.pi)
+    return -20.0*np.exp(-0.2*np.sqrt(first_sum/2)) - np.exp(second_sum/2) + 20 + np.e
+
+def draw_ackley():
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    x = np.arange(-8, 8, 0.25)
+    y = np.arange(-8, 8, 0.25)
+    x, y = np.meshgrid(x, y)
+    [r,c] = np.shape(x)
+    z = [[] for _ in range(r)]
+    for i in range(r):
+        for j in range(c):
+            z[i].append(ackley(x[i][j], y[i][j]))
+    ax.plot_surface(x, y, np.array(z), rstride=1, cstride=1,  cmap="gnuplot", linewidth=0, antialiased=False)
+    plt.show()
+
 if __name__ == "__main__":
-    draw_schaffer_function()
+    draw_ackley()

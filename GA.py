@@ -153,7 +153,8 @@ def ga():
     sign = 0
     pop = Population(individual_num)
     # best = [b2d(pop.individuals[0].x[0]) * 10 /1024.0, b2d(pop.individuals[0].x[1]) * 10 /1024.0]
-    for _ in range(iteration_num):
+    nums = 0
+    while 1:
         selection(pop)
         crossover(pop, pc)
         mutation(pop, pm)
@@ -171,6 +172,11 @@ def ga():
         #         times = 0
         if len(record) == 0 or best[1] < record[-1][1]:
             record.append(best)
+            nums = 0
+        else:
+            nums += 1
+        if nums > 100:
+            break
 
     best = record[-1]
     print "GA done"

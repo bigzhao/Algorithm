@@ -10,24 +10,14 @@ from mpl_toolkits.mplot3d import Axes3D
 from numpy import cos
 
 
-def objective_function(chromosome):
-    x = chromosome[0]
-    y = chromosome[1]
-    # return ((1*cos((1+1)*x+1))+(2*cos((2+1)*x+2))+(3*cos((3+1)*x+3)) +
-    # (4*cos((4+1)*x+4))+(5*cos((5+1)*x+5)))*((1*cos((1+1)*y+1)) +
-    # (2*cos((2+1)*y+2))+(3*cos((3+1)*y+3))+(4*cos((4+1)*y+4)) +
-    # (5*cos((5+1)*y+5)))
-    # """F6 Griewank's function
-    # multi-modal, symmetric, inseparable"""
-    # part1 = 0
-    # for i in range(len(chromosome)):
-    #     part1 += chromosome[i]**2
-    # part2 = 1
-    # for i in range(len(chromosome)):
-    #     part2 *= math.cos(float(chromosome[i]) / math.sqrt(i+1))
-    # return 1 + (float(part1)/4000.0) - float(part2)
-    return 0.5 + (math.pow(np.sin(math.sqrt(x*x + y*y)), 2) - 0.5)/math.pow(1 + 0.001*(x*x + y*y), 2)
-
+def objective_function(x):
+    part_1, part_2 = 0, 1
+    length = len(x)
+    for i in range(length):
+        part_1 += x[i] * x[i]
+        part_2 *= np.cos(x[i]/np.sqrt(i+1))
+    part_1 /= 1/4000.0
+    return 1 + part_1 - part_2
 
 
 class Particle(object):
@@ -59,10 +49,10 @@ class Particle(object):
         return s
 
 def pso(w, c1, c2):
-    numberParticles = 30
-    numberIterations = 100
+    numberParticles = 500
+    numberIterations = 1000
     iteration = 0
-    Dim = 2
+    Dim = 50
     minX = -100.0
     maxX = 100.0
     bestGlobalPosition = []
@@ -77,7 +67,7 @@ def pso(w, c1, c2):
             lo = minX
             hi = maxX
             randomPosition.append((hi - lo) * random.random() + lo)
-            print randomPosition
+            # print randomPosition
 
         fitness = objective_function(randomPosition)
         randomVelocity = []
@@ -102,7 +92,10 @@ def pso(w, c1, c2):
     iterator = []
     bestFitness = []
     #迭代 套公式求最优
+    nums = 0
     for k in range(numberIterations):
+    # while 1:
+    #     sign = 0  # 标志 用来标记是否最优解发生了
         for i in range(numberParticles):
             record[0].append(swarm[i].position[0])
             record[1].append(swarm[i].position[1])
@@ -141,14 +134,20 @@ def pso(w, c1, c2):
                 currP.bestFitness = newFitness
                 currP.bestPosition = newPosition[:]
             if newFitness < bestGlobalFitness:
+                sign = 1
                 bestGlobalFitness = newFitness
                 bestGlobalPosition = newPosition[:]
             best_posx.append(currP.bestPosition[0])
             best_posy.append(currP.bestPosition[1])
             best_fitness.append(currP.bestFitness)
-
-        iterator.append(k)
+        # iterator.append(k)
         bestFitness.append(bestGlobalFitness)
+        # if sign:
+        #     sign = 0
+        # else:
+        #     nums += 1
+        # if nums > 100:
+        #     break
 
 
 
@@ -158,17 +157,20 @@ def pso(w, c1, c2):
     for i in range(Dim):
         print "x" + str(i) + " = ", str(bestGlobalPosition[i])+" "
     print "\nEnd PSO demonstration\n"
-    print iterator
+    # print iterator
     print bestFitness
     # plt.plot(iterator, bestFitness, 'b')
     # plt.show()
     return iterator, bestFitness, record, best_posx, best_posy, best_fitness
 
 if __name__ == "__main__":
-    mpl.rcParams['font.sans-serif'] = ['SimHei']
-    matplotlib.rcParams['axes.unicode_minus'] = False
-    plt.style.use("ggplot")
+    # mpl.rcParams['font.sans-serif'] = ['SimHei']
+    # matplotlib.rcParams['axes.unicode_minus'] = False
+    # plt.style.use("ggplot")
+    import time
+    t = time.time()
     iterator1, bestFitness1, record, best_posx,best_posy,best_fitness = pso(0.729, 1.49445, 1.49445)
+    print time.time()-t
     # iterator2, bestFitness2 = pso(-2, 1.49445, 1.49445)
     # iterator3, bestFitness3 = pso(-1.5, 1.49445, 1.49445)
     # iterator4, bestFitness4 = pso(-1, 1.49445, 1.49445)
@@ -176,18 +178,18 @@ if __name__ == "__main__":
     # plt.figure(1)  # 创建图表1
     # plt.plot(iterator1, bestFitness1, 'b')
     # plt.title('c=0.729')
-    fig = plt.figure(1, figsize=(14, 6))  # 创建图表2
-    ax = fig.add_subplot(1, 1, 1, projection='3d')
-    # x = record[0]
-    # y = record[1]
-    # z = record[2]
-    # ax.scatter(x, y, z, c='b')
-    # plt.title('所有粒子走向图')
-
-    ax = fig.add_subplot(1, 1, 1, projection='3d')
-    ax.scatter(best_posx, best_posy, best_fitness, c='r')
-    # plt.plot(iterator2, bestFitness2, 'b')
-    plt.title('局部最优解走向图')
+    # fig = plt.figure(1, figsize=(14, 6))  # 创建图表2
+    # ax = fig.add_subplot(1, 1, 1, projection='3d')
+    # # x = record[0]
+    # # y = record[1]
+    # # z = record[2]
+    # # ax.scatter(x, y, z, c='b')
+    # # plt.title('所有粒子走向图')
+    #
+    # ax = fig.add_subplot(1, 1, 1, projection='3d')
+    # ax.scatter(best_posx, best_posy, best_fitness, c='r')
+    # # plt.plot(iterator2, bestFitness2, 'b')
+    # plt.title('局部最优解走向图')
     #
     #
     # plt.figure(3)  # 创建图表1
@@ -203,18 +205,18 @@ if __name__ == "__main__":
     # plt.figure(5)  # 创建图表1
     # plt.plot(iterator5, bestFitness5, 'b')
     # plt.title('c=0.5')
-    fig2 = plt.figure(2)
-    ax = Axes3D(fig2)
-    plt.ion()
-    ax.set_xlim(-100, 100)
-    ax.set_ylim(-100, 100)
-    ax.set_zlim(0, 1)
-    for i in range(len(best_posx)):
-        # y = np.random.random()
-        ax.scatter(best_posx[i], best_posy[i], best_fitness[i], c='r')
-        plt.pause(0.01)
-    plt.title("动态局部解走向图")
-    plt.show()
+    # fig2 = plt.figure(2)
+    # ax = Axes3D(fig2)
+    # plt.ion()
+    # ax.set_xlim(-100, 100)
+    # ax.set_ylim(-100, 100)
+    # ax.set_zlim(0, 1)
+    # for i in range(len(best_posx)):
+    #     # y = np.random.random()
+    #     ax.scatter(best_posx[i], best_posy[i], best_fitness[i], c='r')
+    #     plt.pause(0.01)
+    # plt.title("动态局部解走向图")
+    # plt.show()
 
 
 
